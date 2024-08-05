@@ -26,7 +26,7 @@ const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: '',
-  database: 'my_users'
+  database: 'my_expenses'
 });
 
 // Connect to database
@@ -85,16 +85,17 @@ const user = {
 // Define the add expense logic
 app.post('/user/expenses', userAuthenticated, (req, res) => {
   const { expense, category, amount } = req.body;
+  const userId = req.session.user.id; // Get the user ID from the session
 
   if (!expense || !category || !amount) {
     return res.status(400).send('Expense, category, and amount are required');
   }
 
-  const query = 'INSERT INTO expenses (expense, category, amount) VALUES (?, ?, ?)';
-  connection.query(query, [expense, category, amount], (err, result) => {
+  const query = 'INSERT INTO expenses (expense, category, amount, user_id) VALUES (?, ?, ?, ?)';
+  connection.query(query, [expense, category, amount, userId], (err, result) => {
     if (err) {
       console.error('Database error:', err);
-      return res.status(500).json({ message: 'An error occurred while adding expense. Please try again later.' });
+      return res.status(500).json({ message: 'An error occurred while adding expense.' });
     }
     res.status(201).json({ message: 'Expense added successfully' });
   });
@@ -103,7 +104,9 @@ app.post('/user/expenses', userAuthenticated, (req, res) => {
 // Define delete route for an expense
 app.delete('/user/expenses/:id', userAuthenticated, (req, res) => {
   const { id } = req.params;
-  connection.query('DELETE FROM expenses WHERE id = ?', [id], (error, results) => {
+  const userId = req.session.user.id; // Get the user ID from the session
+
+  connection.query('DELETE FROM expenses WHERE id = ? AND user_id = ?', [id, userId], (error, results) => {
     if (error) {
       console.error('Error deleting expense:', error);
       return res.status(500).json({ message: 'An error occurred while deleting expense.' });
@@ -196,8 +199,9 @@ app.post('/user/login', (request, response) => {
 
 // Data sent to the table
 app.get('/user/expenses', userAuthenticated, (req, res) => {
-  const sql = 'SELECT id, expense, category, amount FROM expenses';
-  connection.query(sql, (err, results) => {
+  const userId = req.session.user.id; // Get the user ID from the session
+  const sql = 'SELECT id, expense, category, amount FROM expenses WHERE user_id = ?';
+  connection.query(sql, [userId], (err, results) => {
     if (err) {
       console.error('Error fetching data from the database:', err);
       return res.status(500).send('Server error');

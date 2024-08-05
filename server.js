@@ -4,7 +4,7 @@ const mysql = require('mysql2');
 const path = require('path');
 const session = require('express-session');
 const { check, validationResult } = require('express-validator');
-const port = 4200;
+const port = 4800;
 
 // Initialize the application
 const app = express();
@@ -29,7 +29,6 @@ const connection = mysql.createConnection({
   database: 'my_users'
 });
 
-
 // Connect to database
 connection.connect((error) => {
   if (error) {
@@ -38,6 +37,15 @@ connection.connect((error) => {
   }
   console.log('Connected to database server');
 });
+
+// Define middleware to check if user is authenticated
+const userAuthenticated = (request, response, next) => {
+  if (request.session.user) {
+    return next();
+  } else {
+    response.redirect('/login');
+  }
+};
 
 // Define routes
 app.get('/register', (request, response) => {
@@ -48,12 +56,16 @@ app.get('/login', (request, response) => {
   response.sendFile(path.join(__dirname, 'login.html'));
 });
 
-app.get('/expenses', (request, response) => {
+app.get('/expenses', userAuthenticated, (request, response) => {
   response.sendFile(path.join(__dirname, 'expenses.html'));
 });
 
-app.get('/dashboard', (request, response) => {
+app.get('/dashboard', userAuthenticated, (request, response) => {
   response.sendFile(path.join(__dirname, 'dashboard.html'));
+});
+
+app.get('/', (request, response) => {
+  response.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Define a user object registration
@@ -71,7 +83,7 @@ const user = {
 }
 
 // Define the add expense logic
-app.post('/user/expenses', (req, res) => {
+app.post('/user/expenses', userAuthenticated, (req, res) => {
   const { expense, category, amount } = req.body;
 
   if (!expense || !category || !amount) {
@@ -89,7 +101,7 @@ app.post('/user/expenses', (req, res) => {
 });
 
 // Define delete route for an expense
-app.delete('/user/expenses/:id', (req, res) => {
+app.delete('/user/expenses/:id', userAuthenticated, (req, res) => {
   const { id } = req.params;
   connection.query('DELETE FROM expenses WHERE id = ?', [id], (error, results) => {
     if (error) {
@@ -174,7 +186,7 @@ app.post('/user/login', (request, response) => {
       if (err) throw err;
       if (isMatch) {
         request.session.user = user;
-        response.status(200).json({ message: 'Login successful' });
+        response.redirect('/dashboard');
       } else {
         response.status(401).send('Invalid username or password');
       }
@@ -183,7 +195,7 @@ app.post('/user/login', (request, response) => {
 });
 
 // Data sent to the table
-app.get('/user/expenses', (req, res) => {
+app.get('/user/expenses', userAuthenticated, (req, res) => {
   const sql = 'SELECT id, expense, category, amount FROM expenses';
   connection.query(sql, (err, results) => {
     if (err) {
@@ -193,15 +205,6 @@ app.get('/user/expenses', (req, res) => {
     res.json(results);
   });
 });
-
-// Handle authorization
-const userAuthenticated = (request, response, next) => {
-  if (request.session.user) {
-    return next();
-  } else {
-    response.redirect('/login');
-  }
-};
 
 // Kill a session
 app.get('/logout', (request, response) => {

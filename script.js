@@ -39,7 +39,61 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Fetch expenses data to chart
+  // Fetch expenses data to pie chart
+  fetch('/user/expenses')
+    .then(response => response.json())
+    .then(data => {
+      const ctx = document.getElementById('expensePieChart').getContext('2d');
+
+      const labels = data.map(item => item.category);
+      const amounts = data.map(item => item.amount);
+
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Expenses',
+            data: amounts,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(255, 206, 86, 0.2)',
+              'rgba(75, 192, 192, 0.2)',
+              'rgba(153, 102, 255, 0.2)',
+              'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)',
+              'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(tooltipItem) {
+                  return tooltipItem.label + ': $' + tooltipItem.raw.toFixed(2);
+                }
+              }
+            }
+          }
+        }
+      });
+    })
+    .catch(error => console.error('Error fetching data:', error));
+
+  // Fetch expenses data to bar chart
   fetch('/user/expenses')
     .then(response => response.json())
     .then(data => {
@@ -71,6 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .catch(error => console.error('Error fetching data:', error));
 
+  // USER REGISTRATION
   if (registerForm) {
     registerForm.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -108,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // USER LOGIN
   if (loginForm) {
     loginForm.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -127,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (response.ok) {
           alert('Login successful');
+          window.location.href = '/dashboard'; // Redirect to dashboard on successful login
         } else {
           const errorData = await response.json();
           alert(`Login failed: ${errorData.message}`);
@@ -190,4 +247,14 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   fetchExpenses(); // Fetch and display expenses
+
+  // Mobile hamburger navigation
+  const hamburger = document.getElementById("hamburger");
+  const navMenu = document.getElementById("nav-menu");
+
+  hamburger.addEventListener("click", () => {
+    navMenu.classList.toggle("active");
+    hamburger.classList.toggle("active");
+  });
+
 });

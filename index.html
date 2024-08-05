@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav-container">
+                <a href="/" img src="logo.png" alt="logo" class="logo">Logo</a>
+                
+
+                <button class="hamburger" id="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+                <ul class="nav-menu" id="nav-menu">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/expenses">My Expenses</a></li>
+                    <li><a href="/login" class="button">Login</a></li>
+                    <li><a href="/register" class="button">Register</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section id="hero" class="section">
+            <div class="container">
+                <h1>Welcome to Expense Tracker</h1>
+                <p>Manage your expenses and budget efficiently.</p>
+                <a href="/register" class="cta-button">Get Started</a>
+            </div>
+        </section>
+        <section id="services" class="section mt-3">
+            <div class="container">
+                <h2>Track your expenses like a pro</h2>
+                <div class="services-container">
+                    <div class="service-card">Budgeting</div>
+                    <div class="service-card">Loss Mitigation</div>
+                    <div class="service-card">Easy to Use</div>
+                    <div class="service-card">Informed Planning</div>
+                </div>
+            </div>
+        </section>
+        <section id="about" class="section mt-3">
+            <div class="container text-center">
+                <div class="about-container">
+                    <h2>About the App</h2>
+                    <p>Our expense tracker helps you manage your finances effectively with easy-to-use tools and detailed insights.</p>
+                    <button onclick="window.location.href='/register'">Register Now</button>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

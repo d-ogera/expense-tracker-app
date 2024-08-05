@@ -4,7 +4,7 @@ const mysql = require('mysql2');
 const path = require('path');
 const session = require('express-session');
 const { check, validationResult } = require('express-validator');
-const port = 4000;
+const port = 4200;
 
 // Initialize the application
 const app = express();

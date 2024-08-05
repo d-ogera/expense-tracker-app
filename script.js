@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (response.ok) {
           alert('Expense added successfully');
+          fetchExpenses(); // Refresh the table after adding expense
         } else {
           const errorData = await response.json();
           alert(`Expense addition failed: ${errorData.message}`);
@@ -256,5 +257,4 @@ document.addEventListener('DOMContentLoaded', () => {
     navMenu.classList.toggle("active");
     hamburger.classList.toggle("active");
   });
-
 });
